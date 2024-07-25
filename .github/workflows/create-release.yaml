@@ -1,0 +1,139 @@
+name: create release
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Release name ( e.g. "2.1.3" )'
+        default: ""
+        required: true
+      latest_release:
+        description: 'Latest release'
+        type: boolean
+        default: false
+
+permissions: # used by build images steps
+  id-token: write # This is required for requesting the JWT token
+  contents: read # This is required for actions/checkout
+
+
+jobs:
+  create-tag:
+    name: Create tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }}  # Checkout to latest branch changes
+
+      - name: Create tag
+        run: |
+          git tag ${{ github.event.inputs.name }}
+          git push origin ${{ github.event.inputs.name }}
+
+  compute-tags:
+    needs: create-tag
+    runs-on: ubuntu-latest
+    outputs:
+      tags: ${{ steps.get_tag.outputs.TAGS }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get the latest tag
+        id: get_tag
+        run: |
+          {
+            echo 'TAGS<<EOF'
+            echo "${{ github.sha }}"
+            echo "${{ github.event.inputs.name }}"
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+  build-operator:
+    needs: compute-tags
+    uses: kyma-project/test-infra/.github/workflows/image-builder.yml@main # Usage: kyma-project/test-infra/.github/workflows/image-builder.yml@main
+    with:
+      name: dockerregistry-operator
+      dockerfile: components/operator/Dockerfile
+      tags: ${{ needs.compute-tags.outputs.tags }}
+  build-registry-init:
+    needs: compute-tags
+    uses: kyma-project/test-infra/.github/workflows/image-builder.yml@main # Usage: kyma-project/test-infra/.github/workflows/image-builder.yml@main
+    with:
+      name: registry-init
+      dockerfile: components/registry-init/Dockerfile
+      tags: ${{ needs.compute-tags.outputs.tags }}
+
+  create-draft:
+    name: Create draft release
+    needs: [build-operator, build-registry-init]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref_name }} # checkout to latest branch changes ( by default this action checkouts to the SHA that triggers action )
+
+      - name: Create changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PULL_BASE_REF: ${{ github.event.inputs.name }}
+        run: ./.github/scripts/create_changelog.sh ${{ github.event.inputs.name }}
+
+      - name: Create draft release
+        id: create-draft
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RELEASE_ID=$(./.github/scripts/create_draft_release.sh ${{ github.event.inputs.name }})
+          echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
+
+      - name: Create release assets
+        id: create-assets
+        env:
+          IMG: "europe-docker.pkg.dev/kyma-project/prod/dockerregistry-operator:${{ github.event.inputs.name }}"
+          PULL_BASE_REF: ${{ github.event.inputs.name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./.github/scripts/release.sh
+
+    outputs:
+      release_id: ${{ steps.create-draft.outputs.release_id }}
+
+  run-integration-test:
+    name: Run integration test
+    needs: create-draft
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-go
+      - uses: ./.github/actions/create-k3d-cluster
+      - name: run test
+        run: |
+          make -C components/operator deploy
+          make -C tests/operator test
+        env:
+          IMG: europe-docker.pkg.dev/kyma-project/prod/dockerregistry-operator:${{ github.event.inputs.name }}
+      - if: ${{ always() }}
+        uses: ./.github/actions/collect-cluster-info
+
+  publish-release:
+    name: Publish release
+    needs: run-integration-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.name }} # checkout to latest branch changes ( by default this action checkouts to the SHA that triggers action )
+          
+      - name: Publish release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./.github/scripts/publish_release.sh ${{ needs.create-draft.outputs.release_id }} ${{ github.event.inputs.latest_release }}

@@ -1,0 +1,22 @@
+patches:
+  - patch: |
+      - op: add
+        path: "/metadata/labels"
+        value: 
+          app.kubernetes.io/component: rbac
+          app.kubernetes.io/instance: dockerregistry-operator-role
+    target:
+      group: rbac.authorization.k8s.io
+      version: v1
+      kind: ClusterRole
+      name: operator-role
+
+resources:
+# All RBAC will be applied under this service account in
+# the deployment namespace. You may comment out this resource
+# if your operator will use a service account that exists at
+# runtime. Be sure to update RoleBinding and ClusterRoleBinding
+# subjects if changing service account names.
+- service_account.yaml
+- role.yaml
+- role_binding.yaml

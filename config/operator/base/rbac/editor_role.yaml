@@ -1,0 +1,27 @@
+# permissions for end users to edit dockerregistry.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/instance: dockerregistry-operator-editor-role
+    app.kubernetes.io/component: rbac
+  name: operator-editor-role
+rules:
+- apiGroups:
+  - operator.kyma-project.io
+  resources:
+  - dockerregistries
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - operator.kyma-project.io
+  resources:
+  - dockerregistries/status
+  verbs:
+  - get

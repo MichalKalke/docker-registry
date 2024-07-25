@@ -1,55 +1,84 @@
-> **NOTE:** This is a general template that you can use for a project README.md. Except for the mandatory sections, use only those sections that suit your use case but keep the proposed section order.
->
-> Mandatory sections: 
-> - `Overview`
-> - `Prerequisites`, if there are any requirements regarding hard- or software
-> - `Installation`
-> - `Contributing` - do not change this!
-> - `Code of Conduct` - do not change this!
-> - `Licensing` - do not change this!
+# Docker Registry
 
-# {Project Title}
-<!--- mandatory --->
-> Modify the title and insert the name of your project. Use Heading 1 (H1).
+## Status
+
+![GitHub tag checks state](https://img.shields.io/github/checks-status/kyma-project/docker-registry/main?label=docker-registry&link=https%3A%2F%2Fgithub.com%2Fkyma-project%2Fdocker-registry%2Fcommits%2Fmain)
+[![REUSE status](https://api.reuse.software/badge/github.com/kyma-project/docker-registry)](https://api.reuse.software/info/github.com/kyma-project/docker-registry)
 
 ## Overview
-<!--- mandatory section --->
 
-> Provide a description of the project's functionality.
->
-> If it is an example README.md, describe what the example illustrates.
+The Docker Registry module provides a lightweight, open-source Docker registry for storing and distributing container images in the Kubernetes environment. You can use it in self-contained development clusters or testing environments, so you can test deployments in an isolated system.
 
-## Prerequisites
+> [!WARNING]  
+> Do not use Docker Registry in production clusters, where a full-fledged, highly-available, production-grade registry is necessary.
 
-> List the requirements to run the project or example.
+The Docker Registry module comes with a dedicated Kubernetes operator for effortless installation and upgrades. It manages the lifecycle of the Docker Registry resources according to the desired specification expressed through a dedicated [`Dockerregistry` custom resource (CR)](docs/user/technical-reference/resources/06-20-docker-registry-cr.md). Read more about configuration options in the [user documentation](./docs/user).
 
-## Installation
+## Install
 
-> Explain the steps to install your project. If there are multiple installation options, mention the recommended one and include others in a separate document. Create an ordered list for each installation task.
->
-> If it is an example README.md, describe how to build, run locally, and deploy the example. Format the example as code blocks and specify the language, highlighting where possible. Explain how you can validate that the example ran successfully. For example, define the expected output or commands to run which check a successful deployment.
->
-> Add subsections (H3) for better readability.
+1. Create the `kyma-system` namespace:
+
+```bash
+kubectl create namespace kyma-system
+```
+
+2. Apply the following script to install Docker Registry Operator:
+
+```bash
+kubectl apply -f https://github.com/kyma-project/docker-registry/releases/latest/download/dockerregistry-operator.yaml
+```
+
+3. To get Docker Registry installed, apply the sample Docker Registry custom resource (CR):
+
+```bash
+kubectl apply -f https://github.com/kyma-project/docker-registry/releases/latest/download/default-dockerregistry-cr.yaml
+```
 
 ## Usage
 
-> Explain how to use the project. You can create multiple subsections (H3). Include the instructions or provide links to the related documentation.
+Having installed the Docker Registry module, you can start pushing images to it using [Kyma CLI (v3)](https://github.com/kyma-project/cli?tab=readme-ov-file#install) or, if you decide to expose the registry externally, using Docker CLI.
+For details, see the following tutorials:
+
+* [How to Use Non-Exposed Registry](docs/user/tutorials/01-10-use-registry.md)
+* [How to Expose Registry](docs/user/tutorials/01-20-expose-registry.md)
 
 ## Development
 
-> Add instructions on how to develop the project or example. It must be clear what to do and, for example, how to trigger the tests so that other contributors know how to make their pull requests acceptable. Include the instructions or provide links to related documentation.
+### Prerequisites
 
-## Contributing
-<!--- mandatory section - do not change this! --->
+* Access to a Kubernetes (v1.24 or higher) cluster
+* [Go](https://go.dev/)
+* [k3d](https://k3d.io/)
+* [Docker](https://www.docker.com/)
+* [kubectl](https://kubernetes.io/docs/tasks/tools/)
+* [Kubebuilder](https://book.kubebuilder.io/)
 
-See the [Contributing Rules](CONTRIBUTING.md).
+## Installation in the k3d Cluster Using Make Targets
 
-## Code of Conduct
-<!--- mandatory section - do not change this! --->
+1. Clone the project.
 
-See the [Code of Conduct](CODE_OF_CONDUCT.md) document.
+    ```bash
+    git clone https://github.com/kyma-project/docker-registry.git && cd docker-registry/
+    ```
 
-## Licensing
-<!--- mandatory section - do not change this! --->
+2. Build Docker Registry Operator locally and run it in the k3d cluster.
 
-See the [license](./LICENSE) file.
+    ```bash
+    make run
+    ```
+
+> **NOTE:** To clean up the k3d cluster, use the `make delete-k3d` make target.
+
+## Using Docker Registry Operator
+
+* Create a Docker Registry instance.
+
+    ```bash
+    kubectl apply -f config/samples/default-dockerregistry-cr.yaml
+    ```
+
+* Delete a Docker Registry instance.
+
+    ```bash
+    kubectl delete -f config/samples/default-dockerregistry-cr.yaml
+    ```
