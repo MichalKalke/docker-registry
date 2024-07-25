@@ -20,7 +20,6 @@ permissions: # used by build images steps
 jobs:
   create-tag:
     name: Create tag
-    needs: upgrade-images
     runs-on: ubuntu-latest
 
     steps:
