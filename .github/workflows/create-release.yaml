@@ -53,6 +53,7 @@ jobs:
           PULL_BASE_REF: ${{ github.event.inputs.name }}
         run: |
           echo "${{ github.event.inputs.latest_release }}"
+          echo "${{ github.event.inputs.name }}" 
           ./.github/scripts/create_changelog.sh ${{ github.event.inputs.name }}
 
       - name: Create draft release
