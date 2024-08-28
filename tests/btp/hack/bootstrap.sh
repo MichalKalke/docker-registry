@@ -26,6 +26,7 @@ if [ ! -f ../bin/btp ]; then
     echo "BTP CLI not found!"
     BTP_FILE=$(./tests/btp/hack/get_btp_file_name.sh ${OS_TYPE} ${OS_ARCH})
     ## Detect if operating system
+    echo"${OS_TYPE} ${OS_ARCH} ${BTP_FILE}"
     [[ -z "$BTP_FILE" ]] && { echo "${OS_TYPE} ${OS_ARCH}" ; exit 1; }
     echo ${BTP_FILE}
     mkdir -p ../bin
