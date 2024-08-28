@@ -13,9 +13,7 @@ jobs:
         run: |
           echo "$BTP_ENV" > $ENV_PATH
           export $(cat $ENV_PATH | xargs)
-          pwd
-          ls -la
-          ./../../tests/btp/hack/bootstrap.sh btp-test-${{ github.run_id }}-${{ github.run_attempt }}
+          ./tests/btp/hack/bootstrap.sh btp-test-${{ github.run_id }}-${{ github.run_attempt }}
         env:
           ENV_PATH: /tmp/.env
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
