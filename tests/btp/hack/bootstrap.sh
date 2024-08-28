@@ -23,10 +23,12 @@ if [ ! -f ../bin/kyma ]; then
 fi
 
 if [ ! -f ../bin/btp ]; then
-    BTP_FILE=$(./tests/btp/hack/get_btp_file_name.sh ${OS_TYPE} ${OS_ARCH})
+    echo "BTP CLI not found!"
+    pwd
+    ls -la
+    BTP_FILE=$(./get_btp_file_name.sh ${OS_TYPE} ${OS_ARCH})
     ## Detect if operating system
     [[ -z "$BTP_FILE" ]] && { echo "${OS_TYPE} ${OS_ARCH}" ; exit 1; }
-    echo "BTP CLI not found!"
     echo ${BTP_FILE}
     mkdir -p ../bin
     curl -LJO https://tools.hana.ondemand.com/additional/${BTP_FILE} --cookie "eula_3_2_agreed=tools.hana.ondemand.com/developer-license-3_2.txt"
