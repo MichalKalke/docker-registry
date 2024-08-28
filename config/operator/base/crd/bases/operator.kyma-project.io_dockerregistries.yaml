@@ -63,10 +63,15 @@ spec:
                       Enable indicates whether the external access is enabled.
                       default: false
                     type: boolean
-                  hostPrefix:
+                  gateway:
                     description: |-
-                      HostPrefix is the prefix for the host.
-                      default: registry-<cr_name>.<cr_namespace>
+                      Gateway defines gateway name (in format: <namespace>/<name>)
+                      default: kyma-system/kyma-gateway
+                    type: string
+                  host:
+                    description: |-
+                      Host defines address under which registry will be exposed
+                      should fit to at least one server defined in the gateway
                     type: string
                 type: object
               storage:
@@ -237,6 +242,8 @@ spec:
                       addresses and auth methods.
                     type: string
                 type: object
+              pvc:
+                type: string
               served:
                 description: |-
                   Served signifies that current DockerRegistry is managed.

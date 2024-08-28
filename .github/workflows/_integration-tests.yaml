@@ -1,14 +1,21 @@
-name: integration tests (push)
+name: integration tests
 
 on:
-  push:
-    branches: [ "main", "release-*" ]
+  workflow_call:
+    inputs:
+      image:
+        description: 'The image to test'
+        required: true
+        type: string
+
 
 jobs:
   operator-integration-test:
+    if: ${{ !startsWith(github.event_name, 'pull_request') || github.event.pull_request.draft == false }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/rebase
       - uses: ./.github/actions/setup-go
       - uses: ./.github/actions/create-k3d-cluster
       - name: run test
@@ -16,32 +23,33 @@ jobs:
           make -C components/operator deploy
           make -C tests/operator test
         env:
-          IMG: europe-docker.pkg.dev/kyma-project/prod/dockerregistry-operator:${{ github.sha }}
+          IMG: ${{ inputs.image }}
       - if: ${{ always() }}
         uses: ./.github/actions/collect-cluster-info
 
   gardener-integration-test:
+    if: ${{ !startsWith(github.event_name, 'pull_request') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: ./.github/actions/rebase
       - uses: ./.github/actions/setup-go
-      - name: save service-account
-        shell: bash
-        run: 'echo "$GARDENER_SA" > /tmp/gardener-sa.yaml'
-        env:
-          GARDENER_SA: ${{ secrets.GARDENER_SA }}
       - name: provision gardener
-        run: make -C hack provision-gardener
+        run: |
+          echo "$GARDENER_SA" > $GARDENER_SA_PATH
+          echo "Used kubeconfig file has $(sed -n '$=' $GARDENER_SA_PATH) lines"
+          make -C hack provision-gardener
         env:
           GARDENER_SECRET_NAME: ${{ secrets.GARDENER_SECRET_NAME }}
           GARDENER_PROJECT: ${{ secrets.GARDENER_PROJECT }}
           GARDENER_SA_PATH: /tmp/gardener-sa.yaml
+          GARDENER_SA: ${{ secrets.GARDENER_SA }}
       - name: run test
         run: |
           make -C components/operator deploy
           make -C tests/operator test
         env:
-          IMG: europe-docker.pkg.dev/kyma-project/prod/dockerregistry-operator:${{ github.sha }}
+          IMG: ${{ inputs.image }}
       - name: deprovision gardener
         if: ${{ always() }}
         run: make -C hack deprovision-gardener

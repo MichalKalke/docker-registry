@@ -2,7 +2,6 @@ package state
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/kyma-project/docker-registry/components/operator/api/v1alpha1"
@@ -49,17 +48,6 @@ func GetServedDockerRegistry(ctx context.Context, c client.Client) (*v1alpha1.Do
 	}
 
 	return nil, nil
-}
-
-func resolveRegistryHost(ctx context.Context, r *reconciler, s *systemState) (string, error) {
-	hostPrefix := fmt.Sprintf("registry-%s-%s", s.instance.GetName(), s.instance.GetNamespace())
-
-	externalAccess := s.instance.Spec.ExternalAccess
-	if externalAccess != nil && externalAccess.HostPrefix != nil {
-		hostPrefix = *externalAccess.HostPrefix
-	}
-
-	return s.externalAddressResolver.GetExternalAddress(ctx, r.client, hostPrefix)
 }
 
 // getBTPStorageHyperscaler returns the hyperscaler type of the BTP storage based on unique fields for each hyperscaler

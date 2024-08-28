@@ -1,12 +1,7 @@
 name: images verify
 run-name: ${{github.event.pull_request.title}}
-on: 
-  pull_request:
-    branches: 
-      - main
-    paths: 
-      - sec-scanners-config.yaml
-      - config/docker-registry/values.yaml
+on:
+  workflow_call:
 
 jobs:
   # check if developer doesn't change `main` images in the values.yaml and sec-scanners-config.yaml files

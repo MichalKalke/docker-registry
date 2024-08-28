@@ -1,8 +1,13 @@
-name: build (push)
+name: build
 
 on:
-  push:
-    branches: ["main", "release-*"]
+  workflow_call:
+    inputs:
+      tag:
+        description: 'Additional tag for built images'
+        required: false
+        type: string
+        default: ""
 
 permissions:
   id-token: write # This is required for requesting the JWT token
@@ -16,13 +21,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Get the latest tag
+      - if: ${{ !startsWith(github.event_name, 'pull_request') }}
+        name: Get the latest tag
         id: get_tag
         run: |
           {
             echo 'TAGS<<EOF'
             echo "${{ github.sha }}"
             echo "${{ github.ref_name}}"
+            echo "${{ inputs.tag }}"
             echo EOF
           } >> "$GITHUB_OUTPUT"
 
@@ -33,6 +40,7 @@ jobs:
       name: dockerregistry-operator
       dockerfile: components/operator/Dockerfile
       tags: ${{ needs.compute-tags.outputs.tags }}
+
   build-registry-init:
     needs: compute-tags
     uses: kyma-project/test-infra/.github/workflows/image-builder.yml@main # Usage: kyma-project/test-infra/.github/workflows/image-builder.yml@main

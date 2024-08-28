@@ -34,10 +34,12 @@ func Test_sFnConfigurationStatus(t *testing.T) {
 					},
 				},
 			},
-			flagsBuilder:            chart.NewFlagsBuilder(),
-			nodePortResolver:        registry.NewNodePortResolver(registry.RandomNodePort),
-			externalAddressResolver: &testExternalAddressResolver{expectedAddress: "registry-test-name-test-namespace.cluster.local"},
-			warningBuilder:          warning.NewBuilder(),
+			flagsBuilder:     chart.NewFlagsBuilder(),
+			nodePortResolver: registry.NewNodePortResolver(registry.RandomNodePort),
+			gatewayHostResolver: &testExternalAddressResolver{expectedAccess: &registry.ResolvedAccess{
+				Host: "registry-test-name-test-namespace.cluster.local",
+			}},
+			warningBuilder: warning.NewBuilder(),
 		}
 
 		c := fake.NewClientBuilder().Build()
@@ -82,10 +84,10 @@ func Test_sFnConfigurationStatus(t *testing.T) {
 					},
 				},
 			},
-			flagsBuilder:            chart.NewFlagsBuilder(),
-			nodePortResolver:        registry.NewNodePortResolver(registry.RandomNodePort),
-			externalAddressResolver: &testExternalAddressResolver{expectedError: errors.New("test-error")},
-			warningBuilder:          warning.NewBuilder(),
+			flagsBuilder:        chart.NewFlagsBuilder(),
+			nodePortResolver:    registry.NewNodePortResolver(registry.RandomNodePort),
+			gatewayHostResolver: &testExternalAddressResolver{expectedError: errors.New("test-error")},
+			warningBuilder:      warning.NewBuilder(),
 		}
 
 		s.warningBuilder.With("test warning")
@@ -112,6 +114,44 @@ func Test_sFnConfigurationStatus(t *testing.T) {
 			v1alpha1.ConditionReasonInstalled,
 			"Warning: test warning",
 		)
+	})
+
+	t.Run("update status pvc storage configuration", func(t *testing.T) {
+		s := &systemState{
+			instance: v1alpha1.DockerRegistry{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "test-namespace",
+				},
+				Spec: v1alpha1.DockerRegistrySpec{
+					Storage: &v1alpha1.Storage{
+						PVC: &v1alpha1.StoragePVC{
+							Name: "test-pvc",
+						},
+					},
+				},
+			},
+			flagsBuilder:        chart.NewFlagsBuilder(),
+			nodePortResolver:    registry.NewNodePortResolver(registry.RandomNodePort),
+			gatewayHostResolver: &testExternalAddressResolver{expectedError: errors.New("test-error")},
+			warningBuilder:      warning.NewBuilder(),
+		}
+
+		c := fake.NewClientBuilder().Build()
+		eventRecorder := record.NewFakeRecorder(10)
+		r := &reconciler{log: zap.NewNop().Sugar(), k8s: k8s{client: c, EventRecorder: eventRecorder}}
+		next, result, err := sFnUpdateFinalStatus(context.TODO(), r, s)
+		require.NoError(t, err)
+		require.Nil(t, result)
+		require.Nil(t, next)
+
+		status := s.instance.Status
+		require.Equal(t, "True", status.InternalAccess.Enabled)
+		require.Equal(t, "localhost:32137", status.InternalAccess.PullAddress)
+		require.Equal(t, "dockerregistry.test-namespace.svc.cluster.local:5000", status.InternalAccess.PushAddress)
+		require.Equal(t, "False", status.ExternalAccess.Enabled)
+
+		require.Equal(t, PVCStorageName, status.Storage)
+		require.Equal(t, "test-pvc", status.PVC)
 	})
 
 	t.Run("reconcile from configurationError", func(t *testing.T) {
@@ -169,10 +209,10 @@ func Test_sFnConfigurationStatus(t *testing.T) {
 }
 
 type testExternalAddressResolver struct {
-	expectedAddress string
-	expectedError   error
+	expectedAccess *registry.ResolvedAccess
+	expectedError  error
 }
 
-func (r *testExternalAddressResolver) GetExternalAddress(_ context.Context, _ client.Client, _ string) (string, error) {
-	return r.expectedAddress, r.expectedError
+func (r *testExternalAddressResolver) Do(_ context.Context, _ client.Client, _ v1alpha1.ExternalAccess) (*registry.ResolvedAccess, error) {
+	return r.expectedAccess, r.expectedError
 }

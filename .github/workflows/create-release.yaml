@@ -35,9 +35,16 @@ jobs:
           git push origin ${{ github.event.inputs.name }}
 
 
+  builds:
+    needs: create-tag
+    uses: ./.github/workflows/_build.yaml
+    with:
+      tag: "${{ github.event.inputs.name }}"
+
   create-draft:
     name: Create draft release
-    needs: create-tag
+    needs: [builds]
+
     runs-on: ubuntu-latest
 
     steps:
@@ -76,9 +83,17 @@ jobs:
       release_id: ${{ steps.create-draft.outputs.release_id }}
 
 
+  integrations:
+    needs: create-draft
+    secrets: inherit
+    uses: ./.github/workflows/_integration-tests.yaml
+    with:
+      image: europe-docker.pkg.dev/kyma-project/prod/dockerregistry-operator:${{ github.event.inputs.name }}
+
   publish-release:
     name: Publish release
-    needs: create-draft
+    needs: [integrations, create-draft]
+
     runs-on: ubuntu-latest
 
     steps:

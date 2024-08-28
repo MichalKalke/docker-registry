@@ -35,9 +35,13 @@ type ExternalAccess struct {
 	// default: false
 	Enabled *bool `json:"enabled,omitempty"`
 
-	// HostPrefix is the prefix for the host.
-	// default: registry-<cr_name>.<cr_namespace>
-	HostPrefix *string `json:"hostPrefix,omitempty"`
+	// Gateway defines gateway name (in format: <namespace>/<name>)
+	// default: kyma-system/kyma-gateway
+	Gateway *string `json:"gateway,omitempty"`
+
+	// Host defines address under which registry will be exposed
+	// should fit to at least one server defined in the gateway
+	Host *string `json:"host,omitempty"`
 }
 
 type Storage struct {
@@ -155,6 +159,8 @@ type DockerRegistryStatus struct {
 
 	// Storage signifies the storage type of DockerRegistry.
 	Storage string `json:"storage,omitempty"`
+
+	PVC string `json:"pvc,omitempty"`
 
 	// State signifies current state of DockerRegistry.
 	// Value can be one of ("Ready", "Processing", "Error", "Deleting").

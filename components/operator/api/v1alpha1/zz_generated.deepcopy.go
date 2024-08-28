@@ -141,8 +141,13 @@ func (in *ExternalAccess) DeepCopyInto(out *ExternalAccess) {
 		*out = new(bool)
 		**out = **in
 	}
-	if in.HostPrefix != nil {
-		in, out := &in.HostPrefix, &out.HostPrefix
+	if in.Gateway != nil {
+		in, out := &in.Gateway, &out.Gateway
+		*out = new(string)
+		**out = **in
+	}
+	if in.Host != nil {
+		in, out := &in.Host, &out.Host
 		*out = new(string)
 		**out = **in
 	}

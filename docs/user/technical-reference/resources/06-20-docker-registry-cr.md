@@ -62,7 +62,6 @@ For details, see the [Docker Registry specification file](https://github.com/kym
 |-----------------------------------------|--------|-------------------------------------------------------------------------------------------------------------------|
 | **externalAccess**                      | object | Contains configuration of the registry external access through the `kyma-gateway` Istio Gateway with TLS enabled. |
 | **externalAccess.enabled**              | string | Specifies if registry is exposed.                                                                                 |
-| **externalAccess.hostPrefix**           | string | Specifies prefix for the host address. (default "registry-<cr_name>-<cr_namespace>").                             |
 | **storage**                             | object | Contains configuration of the registry images storage.                                                            |
 | **storage.azure**                       | object | Contains configuration of the Azure storage.                                                                      |
 | **storage.azure.secretName** (required) | string | Specifies the name of the Secret that contains data needed to connect to the Azure storage.                       |
@@ -78,6 +77,7 @@ For details, see the [Docker Registry specification file](https://github.com/kym
 | **storage.gcs.rootdirectory**           | string | The root directory tree in which all registry files are stored. Defaults to the empty string (bucket root).       |
 | **storage.gcs.chunksize**               | string | This is the chunk size used for uploading large blobs, must be a multiple of 256*1024. Defaults to 5242880.       |
 | **storage.btpObjectStore.secretName**   | string | Specifies the name of the Secret that contains data needed to connect to BTP Object Store.                        |
+| **storage.pvc.name** (required)         | string | Specifies the name of the PersistentVolumeClaim.                                                                  |
 
 
 **Status:**

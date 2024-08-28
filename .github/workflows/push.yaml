@@ -1,0 +1,24 @@
+name: push
+
+on:
+  push:
+    branches: [ "main", "release-*" ]
+
+jobs:
+  builds:
+    uses: ./.github/workflows/_build.yaml
+
+  btp-integration-tests:
+    uses: ./.github/workflows/_btp-integration-tests.yaml
+
+  integrations:
+    needs: builds
+    secrets: inherit
+    uses: ./.github/workflows/_integration-tests.yaml
+    with:
+      image: europe-docker.pkg.dev/kyma-project/prod/dockerregistry-operator:${{ github.sha }}
+
+  upgrades:
+    needs: builds
+    secrets: inherit
+    uses: ./.github/workflows/_upgrade-tests.yaml
