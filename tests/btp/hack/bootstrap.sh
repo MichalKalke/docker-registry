@@ -4,7 +4,7 @@ set -e
 # Operating system architecture
 OS_ARCH=$(uname -m)
 # Operating system type
-OS_TYPE=$(uname | tr '[:upper:]' '[:lower:]')
+OS_TYPE=$(uname)
 
 if [ -z "$1" ]
   then
@@ -23,7 +23,9 @@ if [ ! -f ../bin/kyma ]; then
 fi
 
 if [ ! -f ../bin/btp ]; then
-    BTP_FILE=btp-cli-${OS_TYPE}-${OS_ARCH}-latest.tar.gz
+    BTP_FILE=$(./get_btp_file_name.sh ${OS_TYPE} ${OS_ARCH})
+    ## Detect if operating system
+    [[ -z "$BTP_FILE" ]] && { echo "${OS_TYPE} ${OS_ARCH}" ; exit 1; }
     echo "BTP CLI not found!"
     echo ${BTP_FILE}
     mkdir -p ../bin
@@ -32,7 +34,6 @@ if [ ! -f ../bin/btp ]; then
     rm -f ${BTP_FILE}
     echo "BTP CLI downloaded into /bin/btp"
 fi
-
 
 ### TODO refactor to fetching btp Access Token manually via curl towards trusted IAS tenant.
 
