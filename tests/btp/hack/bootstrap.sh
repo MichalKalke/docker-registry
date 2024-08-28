@@ -25,6 +25,7 @@ fi
 if [ ! -f ../bin/btp ]; then
     BTP_FILE=btp-cli-${OS_TYPE}-${OS_ARCH}-latest.tar.gz
     echo "BTP CLI not found!"
+    echo ${BTP_FILE}
     mkdir -p ../bin
     curl -LJO https://tools.hana.ondemand.com/additional/${BTP_FILE} --cookie "eula_3_2_agreed=tools.hana.ondemand.com/developer-license-3_2.txt"
     tar -zxf ${BTP_FILE} --strip-components=1 -C ../bin
