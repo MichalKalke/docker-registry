@@ -14,6 +14,7 @@ jobs:
       - uses: opentofu/setup-opentofu@v1
       - name: BTP integration test
         run: |
+        shell: bash
           echo "$BTP_ENV" > $ENV_PATH
           export $(cat $ENV_PATH | xargs)
           ./bootstrap.sh btp-test-${{ github.run_id }}-${{ github.run_attempt }}
