@@ -15,7 +15,7 @@ jobs:
       - name: BTP integration test
         shell: bash
         run: |
-          ln -sf bash /bin/sh
+          sudo ln -sf bash /bin/sh
           echo "$BTP_ENV" > $ENV_PATH
           export $(cat $ENV_PATH | xargs)
           echo "Used env file has $(sed -n '$=' $ENV_PATH) lines"
