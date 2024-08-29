@@ -1,5 +1,5 @@
 #!/bin/bash
-
+echo "chlebek"
 function get_btp_file_name () {
 
 local _OS_TYPE=$1
