@@ -26,7 +26,7 @@ if [ ! -f ../bin/btp ]; then
     echo "BTP CLI not found!"
     echo "chleb -1"
     echo "${OS_TYPE} ${OS_ARCH}"
-    BTP_FILE=$(./tests/btp/hack/get_btp_file_name.sh ${OS_TYPE} ${OS_ARCH})
+    BTP_FILE=$(./tests/btp/hack/get_btp_file_name.sh "${OS_TYPE}" "${OS_ARCH}")
     echo "chleb 0"
     ## Detect if operating system
     echo "chleb 1"
