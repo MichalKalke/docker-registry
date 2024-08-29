@@ -17,6 +17,7 @@ jobs:
           echo "$BTP_ENV" > $ENV_PATH
           export $(cat $ENV_PATH | xargs)
           echo "Used env file has $(sed -n '$=' $ENV_PATH) lines"
+          cat $ENV_PATH
           ./bootstrap.sh btp-test-${{ github.run_id }}-${{ github.run_attempt }}
         env:
           ENV_PATH: /tmp/.env
