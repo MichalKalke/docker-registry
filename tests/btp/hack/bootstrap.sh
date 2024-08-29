@@ -24,11 +24,17 @@ fi
 
 if [ ! -f ../bin/btp ]; then
     echo "BTP CLI not found!"
+    echo "chleb -1"
     BTP_FILE=$(./tests/btp/hack/get_btp_file_name.sh ${OS_TYPE} ${OS_ARCH})
+    echo "chleb 0"
     ## Detect if operating system
-    echo"${OS_TYPE} ${OS_ARCH} ${BTP_FILE}"
+    echo "chleb 1"
+    echo "${OS_TYPE} ${OS_ARCH} ${BTP_FILE}"
+    echo "chleb 2"
     [[ -z "$BTP_FILE" ]] && { echo "${OS_TYPE} ${OS_ARCH}" ; exit 1; }
+    echo "chleb 3"
     echo ${BTP_FILE}
+    echo "chleb 4"
     mkdir -p ../bin
     curl -LJO https://tools.hana.ondemand.com/additional/${BTP_FILE} --cookie "eula_3_2_agreed=tools.hana.ondemand.com/developer-license-3_2.txt"
     tar -zxf ${BTP_FILE} --strip-components=1 -C ../bin
