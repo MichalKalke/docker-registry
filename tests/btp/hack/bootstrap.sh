@@ -26,6 +26,7 @@ if [ ! -f ../bin/btp ]; then
     echo "BTP CLI not found!"
     echo "chleb -1"
     echo "${OS_TYPE} ${OS_ARCH}"
+    pwd
     ./get_btp_file_name.sh "Linux" "x86_64"
     BTP_FILE=$(./get_btp_file_name.sh "Linux" "x86_64")
     echo "chleb 0"
