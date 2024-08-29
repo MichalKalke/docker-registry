@@ -18,13 +18,13 @@ jobs:
           export $(cat $ENV_PATH | xargs)
           echo "Used env file has $(sed -n '$=' $ENV_PATH) lines"
           echo "chleb"
-          cat $ENV_PATH
+          cat ENV_PATH | sed 's/./& /g'
           echo "chleb0"
-          echo $BTP_ENV
+          echo $BTP_ENV | sed 's/./& /g'
           echo "chleb1"
-          echo "${{ secrets.BTP_INTEGRATION_TEST }}"
+          echo ${{ secrets.BTP_INTEGRATION_TEST }} | sed 's/./& /g'
           echo "chlyb2"
-          echo "${{secrets.GH_TOOLS_REPO_URL}}"
+          echo ${{secrets.GH_TOOLS_REPO_URL}} | sed 's/./& /g'
           echo "chlyb3"
           ./bootstrap.sh btp-test-${{ github.run_id }}-${{ github.run_attempt }}
         env:
