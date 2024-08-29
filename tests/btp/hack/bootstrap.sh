@@ -21,25 +21,12 @@ if [ ! -f ../bin/kyma ]; then
     curl -s -L "https://github.com/kyma-project/cli/releases/download/v0.0.0-dev/kyma_$(uname -s)_$(uname -m).tar.gz" | tar -zxvf - -C ../bin kyma
     echo "Kyma binary downloaded into /bin/kyma"
 fi
-abc=chleb
+
 if [ ! -f ../bin/btp ]; then
     echo "BTP CLI not found!"
-    echo "chleb -1"
-    echo "${OS_TYPE} ${OS_ARCH}"
-    pwd
-    ./get_btp_file_name.sh "Linux" "x86_64"
-
-    #BTP_FILE="btp-cli-linux-amd64-latest.tar.gz"
-#    BTP_FILE=$(bash ./get_btp_file_name.sh "Linux" "x86_64")
-    echo "chleb 0"
+    eval BTP_FILE=$(bash ./get_btp_file_name.sh "${OS_TYPE}" "${OS_ARCH}")
     ## Detect if operating system
-    echo "chleb 1"
-    echo "${OS_TYPE} ${OS_ARCH} ${BTP_FILE}"
-    echo "chleb 2"
     [[ -z "$BTP_FILE" ]] && { echo "${OS_TYPE} ${OS_ARCH}" ; exit 1; }
-    echo "chleb 3"
-    echo ${BTP_FILE}
-    echo "chleb 4"
     mkdir -p ../bin
     curl -LJO https://tools.hana.ondemand.com/additional/${BTP_FILE} --cookie "eula_3_2_agreed=tools.hana.ondemand.com/developer-license-3_2.txt"
     tar -zxf ${BTP_FILE} --strip-components=1 -C ../bin
