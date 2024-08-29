@@ -28,7 +28,8 @@ if [ ! -f ../bin/btp ]; then
     echo "${OS_TYPE} ${OS_ARCH}"
     pwd
     ./get_btp_file_name.sh "Linux" "x86_64"
-    BTP_FILE=$(bash ./get_btp_file_name.sh "Linux" "x86_64")
+    source ./get_btp_file_name.sh
+    BTP_FILE=$(get_btp_file_name "Linux" "x86_64")
     echo "chleb 0"
     ## Detect if operating system
     echo "chleb 1"
