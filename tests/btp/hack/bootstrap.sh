@@ -21,14 +21,14 @@ if [ ! -f ../bin/kyma ]; then
     curl -s -L "https://github.com/kyma-project/cli/releases/download/v0.0.0-dev/kyma_$(uname -s)_$(uname -m).tar.gz" | tar -zxvf - -C ../bin kyma
     echo "Kyma binary downloaded into /bin/kyma"
 fi
-
+abc=chleb
 if [ ! -f ../bin/btp ]; then
     echo "BTP CLI not found!"
     echo "chleb -1"
     echo "${OS_TYPE} ${OS_ARCH}"
     pwd
     ./get_btp_file_name.sh "Linux" "x86_64"
-abc=chleb
+
     #BTP_FILE="btp-cli-linux-amd64-latest.tar.gz"
 #    BTP_FILE=$(bash ./get_btp_file_name.sh "Linux" "x86_64")
     echo "chleb 0"
