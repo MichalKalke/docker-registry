@@ -10,6 +10,7 @@ echo $PASSWORD
 
 echo Testing Docker Registry availibility at: $REGISTRY_URL
 
+sleep 10
 COUNTER=0
 RESPONSE_CODE=$(curl  -o /dev/null -u $USERNAME:$PASSWORD -L -w ''%{http_code}'' --connect-timeout 5 \
     --max-time 10 \
