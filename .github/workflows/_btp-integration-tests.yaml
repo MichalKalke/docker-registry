@@ -12,14 +12,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: opentofu/setup-opentofu@v1
-      - name: BTP integration test
-        shell: bash
+      - uses: ./.github/actions/setup-kyma
+      - name: Setup envs
         run: |
           sudo ln -sf bash /bin/sh
           echo "$BTP_ENV" > $ENV_PATH
           export $(cat $ENV_PATH | xargs)
           echo "Used env file has $(sed -n '$=' $ENV_PATH) lines"
-          ./bootstrap.sh btp-test-${{ github.run_id }}-${{ github.run_attempt }}
         env:
           ENV_PATH: /tmp/.env
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
+
+      - name: BTP integration test
+        shell: bash
+        run: |
+          ./bootstrap.sh btp-test-${{ github.run_id }}-${{ github.run_attempt }}
+

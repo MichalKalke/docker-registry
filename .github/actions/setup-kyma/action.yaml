@@ -1,0 +1,11 @@
+name: 'Setup kyma'
+description: 'Action for the kyma setup'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install kyma
+      shell: bash
+      run: |
+        mkdir -p ../bin
+        curl -s -L "https://github.com/kyma-project/cli/releases/download/v0.0.0-dev/kyma_$(uname -s)_$(uname -m).tar.gz" | tar -zxvf - -C ../bin kyma
