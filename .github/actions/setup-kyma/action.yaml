@@ -13,7 +13,7 @@ runs:
     - name: Install kyma
       shell: bash
       run: |
-        mkdir -p ${inputs.path}
+        mkdir -p ${{ inputs.path }}
         curl -s -L "https://github.com/kyma-project/cli/releases/download/v0.0.0-dev/kyma_$(uname -s)_$(uname -m).tar.gz" | tar -zxvf - -C ../bin kyma
         ls -la ..
         echo "Chleb"
