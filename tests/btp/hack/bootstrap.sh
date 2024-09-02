@@ -7,7 +7,7 @@ if [ -z "$1" ]
 	exit 1
 fi
 
-#mkdir -p tmp
+
 
 ##ensure kyma CLI into /bin folder
 #if [ ! -f ../bin/kyma ]; then
@@ -49,12 +49,11 @@ KUBECONFIG=tmp/sa-kubeconfig.yaml make create-object-store-reference
 KUBECONFIG=tmp/sa-kubeconfig.yaml make enable_docker_registry
 
 
-# TODO: the following is sort of "kyma push app" equivalent for "cf push"
-KUBECONFIG=tmp/sa-kubeconfig.yaml make docker_registry_login
-KUBECONFIG=tmp/sa-kubeconfig.yaml make docker_push_simple_app
-KUBECONFIG=tmp/sa-kubeconfig.yaml make deploy_simple_app
+## TODO: the following is sort of "kyma push app" equivalent for "cf push"
+#KUBECONFIG=tmp/sa-kubeconfig.yaml make docker_registry_login
+#KUBECONFIG=tmp/sa-kubeconfig.yaml make docker_push_simple_app
+#KUBECONFIG=tmp/sa-kubeconfig.yaml make deploy_simple_app
 
 
 # CLEANUP
-tofu -chdir=../tf destroy -auto-approve
-rm -rf tmp
+#tofu -chdir=../tf destroy -auto-approve
