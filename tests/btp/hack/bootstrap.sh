@@ -1,51 +1,27 @@
 #!/bin/bash
 set -e
 
-# Operating system architecture
-OS_ARCH=$(uname -m)
-# Operating system type
-OS_TYPE=$(uname)
-
 if [ -z "$1" ]
   then
     echo "subaccount name not provided"
 	exit 1
 fi
 
-mkdir -p tmp
+#mkdir -p tmp
 
-#ensure kyma CLI into /bin folder
-if [ ! -f ../bin/kyma ]; then
-    echo "Kyma binary not found!"
-    mkdir -p ../bin
-    curl -s -L "https://github.com/kyma-project/cli/releases/download/v0.0.0-dev/kyma_$(uname -s)_$(uname -m).tar.gz" | tar -zxvf - -C ../bin kyma
-    echo "Kyma binary downloaded into /bin/kyma"
-fi
-
-if [ ! -f ../bin/btp ]; then
-    echo "BTP CLI not found!"
-    eval BTP_FILE=$(bash ./get_btp_file_name.sh "${OS_TYPE}" "${OS_ARCH}")
-    ## Detect if operating system
-    [[ -z "$BTP_FILE" ]] && { echo "${OS_TYPE} ${OS_ARCH}" ; exit 1; }
-    mkdir -p ../bin
-    curl -LJO https://tools.hana.ondemand.com/additional/${BTP_FILE} --cookie "eula_3_2_agreed=tools.hana.ondemand.com/developer-license-3_2.txt"
-    tar -zxf ${BTP_FILE} --strip-components=1 -C ../bin
-    rm -f ${BTP_FILE}
-    echo "BTP CLI downloaded into /bin/btp"
-fi
-
-### TODO refactor to fetching btp Access Token manually via curl towards trusted IAS tenant.
-
-../bin/btp login --url $TF_VAR_BTP_BACKEND_URL --user $TF_VAR_BTP_BOT_USER --password $TF_VAR_BTP_BOT_PASSWORD --idp $TF_VAR_BTP_CUSTOM_IAS_TENANT --subdomain $TF_VAR_BTP_GLOBAL_ACCOUNT
-
-../bin/btp set config --format json
+##ensure kyma CLI into /bin folder
+#if [ ! -f ../bin/kyma ]; then
+#    echo "Kyma binary not found!"
+#    mkdir -p ../bin
+#    curl -s -L "https://github.com/kyma-project/cli/releases/download/v0.0.0-dev/kyma_$(uname -s)_$(uname -m).tar.gz" | tar -zxvf - -C ../bin kyma
+#    echo "Kyma binary downloaded into /bin/kyma"
+#fi
 
 export TF_VAR_BTP_SUBACCOUNT=$1
 
 # Create a new subaccount with Kyma instance and OIDC
 tofu -chdir=../tf init
 tofu -chdir=../tf apply -auto-approve
-../bin/btp  target -sa $(cat ../tf/subaccount_id.txt)
 
 ##### ---------------------------------------------------------------------------------
 
