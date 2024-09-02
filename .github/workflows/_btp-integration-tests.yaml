@@ -20,9 +20,8 @@ jobs:
           export $(cat $ENV_PATH | xargs)
           echo "Used env file has $(sed -n '$=' $ENV_PATH) lines"
           export TF_VAR_BTP_SUBACCOUNT=$1
-          pwd
           tofu -chdir=../tf init
-          tofu -chdir=../../tests/btp/tf apply -auto-approve
+          tofu -chdir=../tf apply -auto-approve
         env:
           ENV_PATH: /tmp/.env
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
