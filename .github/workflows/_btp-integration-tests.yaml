@@ -35,7 +35,7 @@ jobs:
           export $(cat $ENV_PATH | xargs)
           echo "Used env file has $(sed -n '$=' $ENV_PATH) lines"
           mkdir -p tmp
-          ./bootstrap.sh btp-test-${{ github.run_id }}-${{ github.run_attempt }}
+          ./bootstrap.sh
         env:
           ENV_PATH: /tmp/.env
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}

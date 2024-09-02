@@ -1,13 +1,6 @@
 #!/bin/bash
 set -e
 
-if [ -z "$1" ]
-  then
-    echo "subaccount name not provided"
-	exit 1
-fi
-
-
 
 ##ensure kyma CLI into /bin folder
 #if [ ! -f ../bin/kyma ]; then
