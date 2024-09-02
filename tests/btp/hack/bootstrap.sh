@@ -16,12 +16,12 @@ fi
 #    curl -s -L "https://github.com/kyma-project/cli/releases/download/v0.0.0-dev/kyma_$(uname -s)_$(uname -m).tar.gz" | tar -zxvf - -C ../bin kyma
 #    echo "Kyma binary downloaded into /bin/kyma"
 #fi
-
-export TF_VAR_BTP_SUBACCOUNT=$1
-
-# Create a new subaccount with Kyma instance and OIDC
-tofu -chdir=../tf init
-tofu -chdir=../tf apply -auto-approve
+#
+#export TF_VAR_BTP_SUBACCOUNT=$1
+#
+## Create a new subaccount with Kyma instance and OIDC
+#tofu -chdir=../tf init
+#tofu -chdir=../tf apply -auto-approve
 
 ##### ---------------------------------------------------------------------------------
 
