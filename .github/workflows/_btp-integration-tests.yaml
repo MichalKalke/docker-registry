@@ -19,6 +19,7 @@ jobs:
           echo "$BTP_ENV" > $ENV_PATH
           export $(cat $ENV_PATH | xargs)
           echo "Used env file has $(sed -n '$=' $ENV_PATH) lines"
+          echo "$TF_VAR_BTP_SUBACCOUNT"
           tofu -chdir=../tf init
           tofu -chdir=../tf apply -auto-approve
         env:
