@@ -2,6 +2,7 @@
 headless-kubeconfig:
 	ls -la ..
 	echo "Chleb"
+	pwd
 	ls -la ../bin
 	( \
 	set -e -o pipefail ;\
