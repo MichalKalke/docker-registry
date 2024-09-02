@@ -19,12 +19,12 @@ jobs:
           echo "$BTP_ENV" > $ENV_PATH
           export $(cat $ENV_PATH | xargs)
           echo "Used env file has $(sed -n '$=' $ENV_PATH) lines"
-          TF_VAR_BTP_SUBACCOUNT=btp-test-${{ github.run_id }}-${{ github.run_attempt }}
           tofu -chdir=../tf init
           tofu -chdir=../tf apply -auto-approve
         env:
           ENV_PATH: /tmp/.env
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
+          TF_VAR_BTP_SUBACCOUNT: btp-test-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: BTP integration test
         shell: bash
