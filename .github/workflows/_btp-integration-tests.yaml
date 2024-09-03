@@ -56,7 +56,7 @@ jobs:
           export $(cat $ENV_PATH | xargs)
           echo "Used env file has $(sed -n '$=' $ENV_PATH) lines"
           echo "$TF_VAR_BTP_SUBACCOUNT"
-          kubectl delete -f k8s-resources/dependencies/object-store-binding.yaml kubeconfig=tmp/sa-kubeconfig.yaml 
+          kubectl delete -n kyma-system -f k8s-resources/dependencies/object-store-binding.yaml kubeconfig=tmp/sa-kubeconfig.yaml 
           kubectl delete serviceinstances.services.cloud.sap.com -n kyma-system object-store-reference kubeconfig=tmp/sa-kubeconfig.yaml
           tofu -chdir=../tf init
           tofu -chdir=../tf destroy -auto-approve
