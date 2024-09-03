@@ -1,9 +1,5 @@
 .PHONY: headless-kubeconfig
 headless-kubeconfig:
-	ls -la ..
-	echo "Chleb"
-	pwd
-	ls -la ../bin
 	( \
 	set -e -o pipefail ;\
 	curl -s -o tmp/kubeconfig.yaml $$(cat ../tf/kubeconfig_url.txt) ;\

@@ -20,8 +20,6 @@ jobs:
           sudo ln -sf bash /bin/sh
           echo "$BTP_ENV" > $ENV_PATH
           export $(cat $ENV_PATH | xargs)
-          echo "Used env file has $(sed -n '$=' $ENV_PATH) lines"
-          echo "$TF_VAR_BTP_SUBACCOUNT"
           tofu -chdir=../tf init
           tofu -chdir=../tf apply -auto-approve
         env:
@@ -29,18 +27,26 @@ jobs:
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
           TF_VAR_BTP_SUBACCOUNT: btp-test-${{ github.run_id }}-${{ github.run_attempt }}
 
-      - name: BTP integration test
-        shell: bash
+      - name: Generate access
         run: |
           sudo ln -sf bash /bin/sh
           echo "$BTP_ENV" > $ENV_PATH
           export $(cat $ENV_PATH | xargs)
-          echo "Used env file has $(sed -n '$=' $ENV_PATH) lines"
-          mkdir -p tmp
-          ./bootstrap.sh
+          make headless-kubeconfig
+          CLUSTERROLE=cluster-admin make service-account-kubeconfig
+
+      - name: Add bindings
+        run: |
+          sudo ln -sf bash /bin/sh
+          echo "$BTP_ENV" > $ENV_PATH
+          export $(cat $ENV_PATH | xargs)
+          KUBECONFIG=tmp/sa-kubeconfig.yaml BTP_PROVIDER_SUBACCOUNT_ID=$TF_VAR_BTP_PROVIDER_SUBACCOUNT_ID make share-sm-service-operator-access
+          KUBECONFIG=tmp/sa-kubeconfig.yaml make create-object-store-reference
+          KUBECONFIG=tmp/sa-kubeconfig.yaml make enable_docker_registry
         env:
           ENV_PATH: /tmp/.env
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
+          TF_VAR_BTP_SUBACCOUNT: btp-test-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Test if docker registry is working
         shell: bash
@@ -54,9 +60,7 @@ jobs:
           sudo ln -sf bash /bin/sh
           echo "$BTP_ENV" > $ENV_PATH
           export $(cat $ENV_PATH | xargs)
-          echo "Used env file has $(sed -n '$=' $ENV_PATH) lines"
-          echo "$TF_VAR_BTP_SUBACCOUNT"
-          kubectl delete -n kyma-system -f k8s-resources/dependencies/object-store-binding.yaml kubeconfig=tmp/sa-kubeconfig.yaml 
+          kubectl delete -n kyma-system -f ../k8s-resources/dependencies/object-store-binding.yaml kubeconfig=tmp/sa-kubeconfig.yaml 
           kubectl delete serviceinstances.services.cloud.sap.com -n kyma-system object-store-reference kubeconfig=tmp/sa-kubeconfig.yaml
           tofu -chdir=../tf init
           tofu -chdir=../tf destroy -auto-approve
