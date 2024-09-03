@@ -14,7 +14,7 @@ jobs:
       - uses: opentofu/setup-opentofu@v1
       - uses: ./.github/actions/setup-kyma
         with:
-          path: "tests/btp/hack/bin"
+          path: "tests/btp/bin"
       - name: Create btp account with kyma enable
         run: |
           sudo ln -sf bash /bin/sh
