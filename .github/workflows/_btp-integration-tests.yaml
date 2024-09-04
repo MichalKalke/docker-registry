@@ -82,7 +82,9 @@ jobs:
           pwd
           ls -la
           echo "BTP CLI not found!"
-          eval BTP_FILE=$(bash pwd | ./get_btp_file_name.sh "${OS_TYPE}" "${OS_ARCH}")
+          ./get_btp_file_name.sh "$(uname -s)" "$(uname -m)"
+          echo "chleb 0"
+          eval BTP_FILE=$(bash pwd | ./get_btp_file_name.sh "$(uname -s)" "$(uname -m)")
           ## Detect if operating system
           [[ -z "$BTP_FILE" ]] && { echo "${OS_TYPE} ${OS_ARCH}" ; exit 1; }
           mkdir -p ../bin
