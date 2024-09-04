@@ -78,6 +78,7 @@ jobs:
       - name: Force delete btp account
         if: always()
         run: |
+          sudo ln -sf bash /bin/sh
           pwd
           ls -la
           echo "BTP CLI not found!"
