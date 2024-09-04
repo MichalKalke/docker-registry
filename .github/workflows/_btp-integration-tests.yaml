@@ -62,11 +62,17 @@ jobs:
 
       - name: Delete btp account
         run: |
+          echo "Chleb 0"
           sudo ln -sf bash /bin/sh
+          echo "Chleb 1"
           echo "$BTP_ENV" > $ENV_PATH
+          echo "Chleb 2"
           export $(cat $ENV_PATH | xargs)
+          echo "Chleb 3"
           kubectl delete -n kyma-system -f ../k8s-resources/dependencies/object-store-binding.yaml kubeconfig=tmp/sa-kubeconfig.yaml 
+          echo "Chleb 4"
           kubectl delete serviceinstances.services.cloud.sap.com -n kyma-system object-store-reference kubeconfig=tmp/sa-kubeconfig.yaml
+          echo "Chleb 5"
           tofu -chdir=../tf init
           tofu -chdir=../tf destroy -auto-approve
         env:
