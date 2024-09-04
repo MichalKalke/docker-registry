@@ -32,6 +32,7 @@ jobs:
           sudo ln -sf bash /bin/sh
           echo "$BTP_ENV" > $ENV_PATH
           export $(cat $ENV_PATH | xargs)
+          mkdir -p tmp
           make headless-kubeconfig
           CLUSTERROLE=cluster-admin make service-account-kubeconfig
         env:
