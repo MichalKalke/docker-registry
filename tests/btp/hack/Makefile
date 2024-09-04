@@ -1,5 +1,7 @@
 .PHONY: headless-kubeconfig
 headless-kubeconfig:
+	pwd
+	ls -la
 	( \
 	set -e -o pipefail ;\
 	curl -s -o tmp/kubeconfig.yaml $$(cat ../tf/kubeconfig_url.txt) ;\
