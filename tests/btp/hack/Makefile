@@ -37,7 +37,7 @@ enable_docker_registry:
 	@while ! kubectl get gateway kyma-gateway -n kyma-system --kubeconfig ${KUBECONFIG}; do echo "Waiting for kyma-gateway..."; sleep 1; done
 	@echo "Enabling docker registry"
 	#TODO change to post build image, not release
-	@kubectl apply -f https://github.com/kyma-project/docker-registry/releases/latest/download/dockerregistry-operator.yaml --kubeconfig ${KUBECONFIG}
+	@kubectl apply -f ${OPERATOR_MANIFEST} --kubeconfig ${KUBECONFIG}
 	@kubectl apply -f ../k8s-resources/dependencies/exposed-docker-registry-with-btp-storage.yaml -n kyma-system --kubeconfig ${KUBECONFIG}
 	@echo "..waiting for docker registry"
 	@kubectl wait --for condition=Installed dockerregistries.operator.kyma-project.io/default -n kyma-system --timeout=300s --kubeconfig ${KUBECONFIG}

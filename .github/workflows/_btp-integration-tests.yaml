@@ -47,7 +47,8 @@ jobs:
 #          export $(cat $ENV_PATH | xargs)
 #          KUBECONFIG=tmp/sa-kubeconfig.yaml BTP_PROVIDER_SUBACCOUNT_ID=$TF_VAR_BTP_PROVIDER_SUBACCOUNT_ID make share-sm-service-operator-access
 #          KUBECONFIG=tmp/sa-kubeconfig.yaml make create-object-store-reference
-#          KUBECONFIG=tmp/sa-kubeconfig.yaml make enable_docker_registry
+#          IMG="europe-docker.pkg.dev/kyma-project/prod/dockerregistry-operator:${{ github.sha }}" make -C ../../../components/operator/ render-manifest
+#          KUBECONFIG=tmp/sa-kubeconfig.yaml OPERATOR_MANIFEST=../../../dockerregistry-operator.yaml make enable_docker_registry
 #        env:
 #          ENV_PATH: /tmp/.env
 #          BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
@@ -93,3 +94,4 @@ jobs:
           rm -f ${BTP_FILE}
           echo "BTP CLI downloaded into /bin/btp"
           ls -la
+#TOFU target read subbaccoi
