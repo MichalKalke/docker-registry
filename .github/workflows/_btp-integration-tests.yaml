@@ -76,7 +76,7 @@ jobs:
 #          BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
 #          TF_VAR_BTP_SUBACCOUNT: btp-test-${{ github.run_id }}-${{ github.run_attempt }}
 
-      - uses: ./.github/actions/setup-kyma
+      - uses: ./.github/actions/setup-btp
         if: always()
         with:
           path: "tests/btp/bin"
