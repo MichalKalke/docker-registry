@@ -76,25 +76,14 @@ jobs:
 #          BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
 #          TF_VAR_BTP_SUBACCOUNT: btp-test-${{ github.run_id }}-${{ github.run_attempt }}
 
+      - uses: ./.github/actions/setup-kyma
+        if: always()
+        with:
+          path: "tests/btp/bin"
+
       - name: Force delete btp account
         if: always()
         run: |
-          sudo ln -sf bash /bin/sh
-          pwd
-          ls -la
-          echo "BTP CLI not found!"
-          echo "chleb 0"
-          eval BTP_FILE=$(bash pwd | ./get_btp_file_name.sh "$(uname -s)" "$(uname -m)")
-          echo "chleb 1"
-          ## Detect if operating system
-          [[ -z "$BTP_FILE" ]] && { echo "${OS_TYPE} ${OS_ARCH}" ; exit 1; }
-          mkdir -p ../bin
-          curl -LJO https://tools.hana.ondemand.com/additional/${BTP_FILE} --cookie "eula_3_2_agreed=tools.hana.ondemand.com/developer-license-3_2.txt"
-          tar -zxf ${BTP_FILE} --strip-components=1 -C ../bin
-          rm -f ${BTP_FILE}
-          echo "BTP CLI downloaded into /bin/btp"
-          ls -la
-          
           sudo ln -sf bash /bin/sh
           echo "$BTP_ENV" > $ENV_PATH
           export $(cat $ENV_PATH | xargs)
