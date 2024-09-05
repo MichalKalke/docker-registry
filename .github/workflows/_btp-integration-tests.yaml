@@ -15,18 +15,18 @@ jobs:
       - uses: ./.github/actions/setup-kyma
         with:
           path: "tests/btp/bin"
-#      - name: Create btp account with kyma enable
-#        run: |
-#          sudo ln -sf bash /bin/sh
-#          echo "$BTP_ENV" > $ENV_PATH
-#          export $(cat $ENV_PATH | xargs)
-#          tofu -chdir=../tf init
-#          tofu -chdir=../tf apply -auto-approve
-#        env:
-#          ENV_PATH: /tmp/.env
-#          BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
-#          TF_VAR_BTP_SUBACCOUNT: btp-test-${{ github.run_id }}-${{ github.run_attempt }}
-#
+      - name: Create btp account with kyma enable
+        run: |
+          sudo ln -sf bash /bin/sh
+          echo "$BTP_ENV" > $ENV_PATH
+          export $(cat $ENV_PATH | xargs)
+          tofu -chdir=../tf init
+          tofu -chdir=../tf apply -auto-approve
+        env:
+          ENV_PATH: /tmp/.env
+          BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
+          TF_VAR_BTP_SUBACCOUNT: btp-test-${{ github.run_id }}-${{ github.run_attempt }}
+
 #      - name: Generate access
 #        run: |
 #          sudo ln -sf bash /bin/sh
@@ -47,7 +47,8 @@ jobs:
 #          export $(cat $ENV_PATH | xargs)
 #          KUBECONFIG=tmp/sa-kubeconfig.yaml BTP_PROVIDER_SUBACCOUNT_ID=$TF_VAR_BTP_PROVIDER_SUBACCOUNT_ID make share-sm-service-operator-access
 #          KUBECONFIG=tmp/sa-kubeconfig.yaml make create-object-store-reference
-#          KUBECONFIG=tmp/sa-kubeconfig.yaml make enable_docker_registry
+#          IMG="europe-docker.pkg.dev/kyma-project/prod/dockerregistry-operator:${{ github.sha }}" make -C ../../../components/operator/ render-manifest
+#          KUBECONFIG=tmp/sa-kubeconfig.yaml OPERATOR_MANIFEST=../../../dockerregistry-operator.yaml make enable_docker_registry
 #        env:
 #          ENV_PATH: /tmp/.env
 #          BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
@@ -93,3 +94,11 @@ jobs:
           rm -f ${BTP_FILE}
           echo "BTP CLI downloaded into /bin/btp"
           ls -la
+          
+          sudo ln -sf bash /bin/sh
+          echo "$BTP_ENV" > $ENV_PATH
+          export $(cat $ENV_PATH | xargs)
+          ../bin/btp delete accounts/subaccount $(cat ../tf/subaccount_id.txt) --global-account ${TF_VAR_BTP_GLOBAL_ACCOUNT} --force-delete true --confirm true
+        env:
+          ENV_PATH: /tmp/.env
+          BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
