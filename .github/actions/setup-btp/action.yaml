@@ -17,7 +17,7 @@ runs:
         pwd
         ls -la
         echo "chleb 0"
-        eval BTP_FILE=$(bash pwd | ./get_btp_file_name.sh "$(uname -s)" "$(uname -m)")
+        eval BTP_FILE=$(bash pwd | ./tests/btp/hack/get_btp_file_name.sh "$(uname -s)" "$(uname -m)")
         echo "chleb 1"
         ## Detect if operating system
         [[ -z "$BTP_FILE" ]] && { echo "${OS_TYPE} ${OS_ARCH}" ; exit 1; }
