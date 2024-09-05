@@ -18,7 +18,7 @@ jobs:
       - name: Create btp account with kyma enable
         run: |
           sudo ln -sf bash /bin/sh
-          #. ./set-tf-envs.sh
+          . ./set-tf-envs.sh
           tofu -chdir=../tf init
           tofu -chdir=../tf apply -auto-approve
         env:
@@ -28,27 +28,23 @@ jobs:
       - name: Generate access
         run: |
           sudo ln -sf bash /bin/sh
-          echo "$BTP_ENV" > $ENV_PATH
-          export $(cat $ENV_PATH | xargs)
+          . ./set-tf-envs.sh
           mkdir -p tmp
           make headless-kubeconfig
           CLUSTERROLE=cluster-admin make service-account-kubeconfig
         env:
-          ENV_PATH: /tmp/.env
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
           TF_VAR_BTP_SUBACCOUNT: btp-test-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Add bindings
         run: |
           sudo ln -sf bash /bin/sh
-          echo "$BTP_ENV" > $ENV_PATH
-          export $(cat $ENV_PATH | xargs)
+          . ./set-tf-envs.sh
           KUBECONFIG=tmp/sa-kubeconfig.yaml BTP_PROVIDER_SUBACCOUNT_ID=$TF_VAR_BTP_PROVIDER_SUBACCOUNT_ID make share-sm-service-operator-access
           KUBECONFIG=tmp/sa-kubeconfig.yaml make create-object-store-reference
           IMG="europe-docker.pkg.dev/kyma-project/prod/dockerregistry-operator:${{ github.sha }}" make -C ../../../components/operator/ render-manifest
           KUBECONFIG=tmp/sa-kubeconfig.yaml OPERATOR_MANIFEST=../../../dockerregistry-operator.yaml make enable_docker_registry
         env:
-          ENV_PATH: /tmp/.env
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
           TF_VAR_BTP_SUBACCOUNT: btp-test-${{ github.run_id }}-${{ github.run_attempt }}
 
@@ -63,14 +59,12 @@ jobs:
         if: always()
         run: |
           sudo ln -sf bash /bin/sh
-          echo "$BTP_ENV" > $ENV_PATH
-          export $(cat $ENV_PATH | xargs)
+          . ./set-tf-envs.sh
           kubectl delete -n kyma-system -f ../k8s-resources/dependencies/object-store-binding.yaml --kubeconfig tmp/sa-kubeconfig.yaml
           kubectl delete serviceinstances.services.cloud.sap.com -n kyma-system object-store-reference --kubeconfig tmp/sa-kubeconfig.yaml
           tofu -chdir=../tf init
           tofu -chdir=../tf destroy -auto-approve
         env:
-          ENV_PATH: /tmp/.env
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
           TF_VAR_BTP_SUBACCOUNT: btp-test-${{ github.run_id }}-${{ github.run_attempt }}
 
@@ -83,10 +77,8 @@ jobs:
         if: always()
         run: |
           sudo ln -sf bash /bin/sh
-          echo "$BTP_ENV" > $ENV_PATH
-          export $(cat $ENV_PATH | xargs)
+          . ./set-tf-envs.sh
           ../bin/btp login --url $TF_VAR_BTP_BACKEND_URL --user $TF_VAR_BTP_BOT_USER --password $TF_VAR_BTP_BOT_PASSWORD --idp $TF_VAR_BTP_CUSTOM_IAS_TENANT --subdomain $TF_VAR_BTP_GLOBAL_ACCOUNT
           ../bin/btp delete accounts/subaccount $(cat ../tf/subaccount_id.txt) --global-account ${TF_VAR_BTP_GLOBAL_ACCOUNT} --force-delete true --confirm true
         env:
-          ENV_PATH: /tmp/.env
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
