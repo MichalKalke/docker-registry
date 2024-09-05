@@ -17,7 +17,6 @@ jobs:
           path: "tests/btp/bin"
       - name: Create btp account with kyma enable
         run: |
-          sudo ln -sf bash /bin/sh
           . ./set-tf-envs.sh
           tofu -chdir=../tf init
           tofu -chdir=../tf apply -auto-approve
@@ -27,7 +26,6 @@ jobs:
 
       - name: Generate access
         run: |
-          sudo ln -sf bash /bin/sh
           . ./set-tf-envs.sh
           mkdir -p tmp
           make headless-kubeconfig
@@ -38,7 +36,6 @@ jobs:
 
       - name: Add bindings
         run: |
-          sudo ln -sf bash /bin/sh
           . ./set-tf-envs.sh
           KUBECONFIG=tmp/sa-kubeconfig.yaml BTP_PROVIDER_SUBACCOUNT_ID=$TF_VAR_BTP_PROVIDER_SUBACCOUNT_ID make share-sm-service-operator-access
           KUBECONFIG=tmp/sa-kubeconfig.yaml make create-object-store-reference
@@ -59,7 +56,6 @@ jobs:
       - name: Delete btp account
         if: always()
         run: |
-          sudo ln -sf bash /bin/sh
           . ./set-tf-envs.sh
           kubectl delete -n kyma-system -f ../k8s-resources/dependencies/object-store-binding.yaml --kubeconfig tmp/sa-kubeconfig.yaml
           kubectl delete serviceinstances.services.cloud.sap.com -n kyma-system object-store-reference --kubeconfig tmp/sa-kubeconfig.yaml
@@ -77,7 +73,6 @@ jobs:
       - name: Force delete btp account
         if: always()
         run: |
-          sudo ln -sf bash /bin/sh
           . ./set-tf-envs.sh
           ../bin/btp login --url $TF_VAR_BTP_BACKEND_URL --user $TF_VAR_BTP_BOT_USER --password $TF_VAR_BTP_BOT_PASSWORD --idp $TF_VAR_BTP_CUSTOM_IAS_TENANT --subdomain $TF_VAR_BTP_GLOBAL_ACCOUNT
           ../bin/btp delete accounts/subaccount $(cat ../tf/subaccount_id.txt) --global-account ${TF_VAR_BTP_GLOBAL_ACCOUNT} --force-delete true --confirm true
