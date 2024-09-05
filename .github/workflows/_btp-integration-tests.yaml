@@ -42,7 +42,8 @@ jobs:
           . ./set-tf-envs.sh
           KUBECONFIG=tmp/sa-kubeconfig.yaml BTP_PROVIDER_SUBACCOUNT_ID=$TF_VAR_BTP_PROVIDER_SUBACCOUNT_ID make share-sm-service-operator-access
           KUBECONFIG=tmp/sa-kubeconfig.yaml make create-object-store-reference
-          IMG="europe-docker.pkg.dev/kyma-project/prod/dockerregistry-operator:${{ github.sha }}" make -C ../../../components/operator/ render-manifest
+          #TODO change below img to be using ${{ github.sha }} instead of main
+          IMG="europe-docker.pkg.dev/kyma-project/prod/dockerregistry-operator:main" make -C ../../../components/operator/ render-manifest
           KUBECONFIG=tmp/sa-kubeconfig.yaml OPERATOR_MANIFEST=../../../dockerregistry-operator.yaml make enable_docker_registry
         env:
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
