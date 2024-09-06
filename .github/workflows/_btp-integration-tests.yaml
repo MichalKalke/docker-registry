@@ -24,6 +24,7 @@ jobs:
         env:
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
           TF_VAR_BTP_SUBACCOUNT: btp-test-${{ github.run_id }}-${{ github.run_attempt }}
+          TF_LOG: trace
 
       - name: Generate access
         run: |
