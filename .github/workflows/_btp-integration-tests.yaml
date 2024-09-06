@@ -20,6 +20,7 @@ jobs:
           . ./set-tf-envs.sh
           tofu -chdir=../tf init
           tofu -chdir=../tf apply -auto-approve
+          echo "SUBACC_ID=$(cat ../tf/subaccount_id.txt)" >> $GITHUB_ENV
         env:
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
           TF_VAR_BTP_SUBACCOUNT: btp-test-${{ github.run_id }}-${{ github.run_attempt }}
@@ -75,7 +76,8 @@ jobs:
         if: always()
         run: |
           . ./set-tf-envs.sh
+          echo "${SUBACC_ID}"
           ../bin/btp login --url $TF_VAR_BTP_BACKEND_URL --user $TF_VAR_BTP_BOT_USER --password $TF_VAR_BTP_BOT_PASSWORD --idp $TF_VAR_BTP_CUSTOM_IAS_TENANT --subdomain $TF_VAR_BTP_GLOBAL_ACCOUNT
-          ../bin/btp delete accounts/subaccount $(cat ../tf/subaccount_id.txt) --global-account ${TF_VAR_BTP_GLOBAL_ACCOUNT} --force-delete true --confirm true
+          ../bin/btp delete accounts/subaccount ${SUBACC_ID} --global-account ${TF_VAR_BTP_GLOBAL_ACCOUNT} --force-delete true --confirm true
         env:
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
