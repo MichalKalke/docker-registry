@@ -26,6 +26,7 @@ jobs:
 
       - name: Generate access
         run: |
+          sudo ln -sf bash /bin/sh
           . ./set-tf-envs.sh
           mkdir -p tmp
           make headless-kubeconfig
