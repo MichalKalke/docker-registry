@@ -1,5 +1,5 @@
 #!/bin/sh
-set -e
+set +e
 
 USERNAME=$(kubectl get secrets -n kyma-system dockerregistry-config-external -o jsonpath={.data.username} --kubeconfig ${KUBECONFIG} | base64 -d)
 PASSWORD=$(kubectl get secrets -n kyma-system dockerregistry-config-external -o jsonpath={.data.password} --kubeconfig ${KUBECONFIG} | base64 -d)
@@ -10,7 +10,6 @@ echo $PASSWORD
 
 echo Testing Docker Registry availibility at: $REGISTRY_URL
 
-sleep 10
 COUNTER=0
 RESPONSE_CODE=$(curl  -o /dev/null -u $USERNAME:$PASSWORD -L -w ''%{http_code}'' --connect-timeout 5 \
     --max-time 10 \
