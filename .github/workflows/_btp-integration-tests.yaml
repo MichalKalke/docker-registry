@@ -11,20 +11,18 @@ jobs:
         working-directory: tests/btp/hack
     steps:
       - uses: actions/checkout@v4
-      - uses: opentofu/setup-opentofu@v1
       - uses: ./.github/actions/setup-kyma
         with:
           path: "tests/btp/bin"
       - name: Create btp account with kyma enable
         run: |
           . ./set-tf-envs.sh
-          tofu -chdir=../tf init
-          tofu -chdir=../tf apply -auto-approve
+          terraform -chdir=../tf init
+          terraform -chdir=../tf apply -auto-approve
           echo "SUBACC_ID=$(cat ../tf/subaccount_id.txt)" >> $GITHUB_ENV
         env:
           BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
           TF_VAR_BTP_SUBACCOUNT: btp-test-${{ github.run_id }}-${{ github.run_attempt }}
-          TF_LOG: trace
 
       - name: Generate access
         run: |
@@ -56,17 +54,17 @@ jobs:
           KUBECONFIG=tmp/sa-kubeconfig.yaml make docker_push_simple_app
           KUBECONFIG=tmp/sa-kubeconfig.yaml make deploy_simple_app
 
-#      - name: Delete btp account
-#        if: always()
-#        run: |
-#          . ./set-tf-envs.sh
-#          kubectl delete -n kyma-system -f ../k8s-resources/dependencies/object-store-binding.yaml --kubeconfig tmp/sa-kubeconfig.yaml
-#          kubectl delete serviceinstances.services.cloud.sap.com -n kyma-system object-store-reference --kubeconfig tmp/sa-kubeconfig.yaml
-#          tofu -chdir=../tf init
-#          tofu -chdir=../tf destroy -auto-approve
-#        env:
-#          BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
-#          TF_VAR_BTP_SUBACCOUNT: btp-test-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Delete btp account
+        if: always()
+        run: |
+          . ./set-tf-envs.sh
+          kubectl delete -n kyma-system -f ../k8s-resources/dependencies/object-store-binding.yaml --kubeconfig tmp/sa-kubeconfig.yaml
+          kubectl delete serviceinstances.services.cloud.sap.com -n kyma-system object-store-reference --kubeconfig tmp/sa-kubeconfig.yaml
+          terraform -chdir=../tf init
+          terraform -chdir=../tf destroy -auto-approve
+        env:
+          BTP_ENV: ${{ secrets.BTP_INTEGRATION_TEST }}
+          TF_VAR_BTP_SUBACCOUNT: btp-test-${{ github.run_id }}-${{ github.run_attempt }}
 
       - uses: ./.github/actions/setup-btp
         if: always()
@@ -77,7 +75,6 @@ jobs:
         if: always()
         run: |
           . ./set-tf-envs.sh
-          echo "${SUBACC_ID}"
           ../bin/btp login --url $TF_VAR_BTP_BACKEND_URL --user $TF_VAR_BTP_BOT_USER --password $TF_VAR_BTP_BOT_PASSWORD --idp $TF_VAR_BTP_CUSTOM_IAS_TENANT --subdomain $TF_VAR_BTP_GLOBAL_ACCOUNT
           ../bin/btp delete accounts/subaccount ${SUBACC_ID} --global-account ${TF_VAR_BTP_GLOBAL_ACCOUNT} --force-delete true --confirm true
         env:
