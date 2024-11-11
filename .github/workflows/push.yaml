@@ -13,7 +13,7 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/_integration-tests.yaml
     with:
-      image: europe-docker.pkg.dev/kyma-project/prod/dockerregistry-operator:${{ github.sha }}
+      image: europe-docker.pkg.dev/kyma-project/prod/dockerregistry-operator:PR-235
 
   upgrades:
     needs: builds
