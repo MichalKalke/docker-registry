@@ -16,6 +16,6 @@ jobs:
       image: europe-docker.pkg.dev/kyma-project/prod/dockerregistry-operator:PR-235
 
   upgrades:
-    needs: builds
+    #needs: builds
     secrets: inherit
     uses: ./.github/workflows/_upgrade-tests.yaml
