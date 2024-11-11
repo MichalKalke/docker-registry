@@ -63,16 +63,13 @@ jobs:
           GARDENER_SA_PATH: /tmp/gardener-sa.yaml
 
   btp-integration-tests:
-    if: ${{ inputs.trigger_btp == 'true' }}
+    if: ${{ inputs.trigger_btp }}
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: tests/btp/hack
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-kyma
-        with:
-          path: "tests/btp/bin"
       - name: Create btp account with kyma enable
         run: |
-          echo "local test of triggering"
+          echo "local test of triggering ${{ inputs.trigger_btp }}"
