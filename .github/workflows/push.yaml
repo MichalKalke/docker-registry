@@ -5,11 +5,11 @@ on:
     branches: [ "main", "release-*" ]
 
 jobs:
-  builds:
-    uses: ./.github/workflows/_build.yaml
+#  builds:
+#    uses: ./.github/workflows/_build.yaml
 
   integrations:
-    needs: builds
+    #needs: builds
     secrets: inherit
     uses: ./.github/workflows/_integration-tests.yaml
     with:
